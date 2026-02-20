@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hourly Cost Calculator</title>
+	<link rel="manifest" href="manifest.json">
+    <style>
+        body { 
+            font-family: system-ui, sans-serif; 
+            background-color: #f4f4f9; 
+            padding: 20px; 
+            margin: 0;
+        }
+        .app-wrapper {
+            max-width: 500px;
+            margin: auto;
+        }
+        /* Tab Bar Styles */
+        .tab-bar {
+            display: flex;
+            overflow-x: auto;
+            background-color: #dcdcdc;
+            padding: 10px 10px 0 10px;
+            border-radius: 8px 8px 0 0;
+            gap: 5px;
+        }
+        .tab-btn {
+            padding: 10px 15px;
+            background-color: #e9ecef;
+            border: none;
+            border-radius: 5px 5px 0 0;
+            cursor: pointer;
+            font-size: 0.9em;
+            color: #555;
+            white-space: nowrap;
+        }
+        .tab-btn:hover {
+            background-color: #f8f9fa;
+        }
+        .tab-btn.active {
+            background-color: #ffffff;
+            font-weight: bold;
+            color: #000;
+            border-top: 3px solid #0056b3;
+        }
+        .btn-add-tab {
+            background-color: #28a745;
+            color: white;
+            font-weight: bold;
+            padding: 10px 15px;
+        }
+        .btn-add-tab:hover {
+            background-color: #218838;
+        }
+
+        /* Calculator Container Styles */
+        .container { 
+            background: #ffffff; 
+            padding: 20px; 
+            border-radius: 0 0 8px 8px; 
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1); 
+        }
+        .header-controls {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            align-items: center;
+        }
+        .header-controls input {
+            margin: 0;
+            flex-grow: 1;
+            font-size: 1em;
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        label, .input-field { 
+            display: block; 
+            width: 100%; 
+            margin-bottom: 12px; 
+            box-sizing: border-box;
+        }
+        .input-field { 
+            padding: 8px; 
+            margin-top: 4px; 
+            border: 1px solid #ccc; 
+            border-radius: 4px; 
+        }
+        button { 
+            width: 100%; 
+            padding: 10px; 
+            margin-top: 10px; 
+            background-color: #0056b3; 
+            color: white; 
+            border: none; 
+            border-radius: 4px; 
+            cursor: pointer; 
+            font-weight: bold;
+        }
+        button:hover { 
+            background-color: #004494; 
+        }
+        .btn-calc-add { background-color: #28a745; }
+        .btn-calc-add:hover { background-color: #218838; }
+        .btn-pay { background-color: #6f42c1; margin-top: 20px; }
+        .btn-pay:hover { background-color: #59339d; }
+        .btn-delete {
+            background-color: #dc3545;
+            color: white;
+            border: none;
+            border-radius: 3px;
+            padding: 4px 8px;
+            cursor: pointer;
+            float: right;
+            font-size: 0.8em;
+            margin-top: -2px;
+            width: auto;
+        }
+        .btn-delete:hover { background-color: #c82333; }
+        .result-box { 
+            font-weight: bold; 
+            margin: 15px 0; 
+            padding: 10px;
+            background-color: #e9ecef;
+            border-radius: 4px;
+            text-align: center;
+        }
+        ul { list-style-type: none; padding: 0; }
+        li { 
+            background: #f8f9fa; 
+            margin: 5px 0; 
+            padding: 10px; 
+            border-left: 4px solid #0056b3; 
+            border-radius: 3px; 
+            font-size: 0.9em;
+            overflow: hidden;
+        }
+        .payment-record { border-left: 4px solid #6f42c1; background: #f4f0fa; }
+        .total-box {
+            font-size: 1.2em;
+            font-weight: bold;
+            text-align: right;
+            margin-top: 20px;
+            color: #d9534f;
+        }
+        hr { border: 0; height: 1px; background: #ddd; margin: 25px 0; }
+        .btn-clear-data {
+            background-color: #dc3545;
+            margin-top: 10px;
+            font-size: 0.8em;
+            padding: 8px;
+        }
+        .btn-clear-data:hover {
+            background-color: #c82333;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="app-wrapper">
+        <div class="tab-bar" id="tabBar">
+            </div>
+
+        <div class="container">
+            <div class="header-controls">
+                <input type="text" id="tabNameInput" placeholder="Name this project..." onkeyup="updateTabName()">
+            </div>
+            
+            <label>Date: <input type="date" id="calcDate" class="input-field"></label>
+            <label>Start Time: <input type="time" id="startTime" class="input-field"></label>
+            <label>End Time: <input type="time" id="endTime" class="input-field"></label>
+            <label>Tariff per Hour (₪): <input type="number" id="tariff" class="input-field" min="0" step="0.01" placeholder="e.g., 25.50"></label>
+
+            <button onclick="calculateCost()">Calculate</button>
+            <div class="result-box" id="currentCostDisplay">Current Calculation: 0.00 hrs = ₪0.00</div>
+            <button class="btn-calc-add" onclick="addToList()">Add to List</button>
+
+            <h3>Recorded Costs</h3>
+            <ul id="costList"></ul>
+            <div class="total-box" id="totalCostDisplay">Total Cost: ₪0.00</div>
+
+            <button class="btn-pay" onclick="processPayment()">Mark as Paid</button>
+
+            <hr>
+            
+            <h3>Payment History</h3>
+            <ul id="paymentList"></ul>
+            
+            <button class="btn-clear-data" onclick="hardReset()">⚠️ Factory Reset App</button>
+        </div>
+    </div>
+
+    <script>
+        // --- DATA & STATE MANAGEMENT ---
+        let appState = {
+            activeTabId: 1,
+            nextTabId: 2,
+            tabs: [
+                {
+                    id: 1,
+                    name: "Project 1",
+                    costs: [], 
+                    payments: [],
+                    total: 0
+                }
+            ]
+        };
+
+        let currentPendingCost = { amount: 0, details: "" };
+
+        // --- LOCAL STORAGE LOGIC ---
+        function saveState() {
+            // Convert the appState object into a text string and save it to the browser
+            localStorage.setItem('myHourlyCalculatorData', JSON.stringify(appState));
+        }
+
+        function loadState() {
+            // Check if there is saved data in the browser
+            const savedData = localStorage.getItem('myHourlyCalculatorData');
+            if (savedData) {
+                // If found, convert the text string back into our appState object
+                appState = JSON.parse(savedData);
+            }
+        }
+
+        function hardReset() {
+            if (confirm("WARNING: This will delete ALL tabs, lists, and payment history forever. Are you absolutely sure?")) {
+                localStorage.removeItem('myHourlyCalculatorData');
+                location.reload(); // Refresh the page to reload factory defaults
+            }
+        }
+
+        // --- SAFE INITIALIZATION ---
+        function initializeApp() {
+            loadState(); // Load data before drawing the interface
+            renderTabs();
+            renderActiveTabData();
+        }
+
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', initializeApp);
+        } else {
+            initializeApp();
+        }
+
+        // --- TAB LOGIC ---
+        function renderTabs() {
+            const tabBar = document.getElementById('tabBar');
+            if (!tabBar) return; 
+            
+            tabBar.innerHTML = ''; 
+
+            appState.tabs.forEach(tab => {
+                const btn = document.createElement('button');
+                btn.className = 'tab-btn' + (tab.id === appState.activeTabId ? ' active' : '');
+                btn.innerText = tab.name;
+                btn.onclick = function() { switchTab(tab.id); };
+                tabBar.appendChild(btn);
+            });
+
+            const addBtn = document.createElement('button');
+            addBtn.className = 'tab-btn btn-add-tab';
+            addBtn.innerText = '+ New Tab';
+            addBtn.onclick = createNewTab;
+            tabBar.appendChild(addBtn);
+        }
+
+        function createNewTab() {
+            const newId = appState.nextTabId++;
+            appState.tabs.push({
+                id: newId,
+                name: "Project " + newId,
+                costs: [],
+                payments: [],
+                total: 0
+            });
+            saveState(); // Save state
+            switchTab(newId);
+        }
+
+        function switchTab(id) {
+            appState.activeTabId = id;
+            saveState(); // Save state
+            
+            currentPendingCost = { amount: 0, details: "" };
+            document.getElementById('currentCostDisplay').innerText = "Current Calculation: 0.00 hrs = ₪0.00";
+            
+            document.getElementById('calcDate').value = "";
+            document.getElementById('startTime').value = "";
+            document.getElementById('endTime').value = "";
+            document.getElementById('tariff').value = "";
+            
+            renderTabs();
+            renderActiveTabData();
+        }
+
+        function updateTabName() {
+            const newName = document.getElementById('tabNameInput').value;
+            let activeTab = null;
+            for(let i=0; i < appState.tabs.length; i++) {
+                if(appState.tabs[i].id === appState.activeTabId) activeTab = appState.tabs[i];
+            }
+            if(!activeTab) return;
+            
+            if (newName.trim() !== "") {
+                activeTab.name = newName;
+                document.title = newName; 
+            } else {
+                activeTab.name = "Project " + activeTab.id;
+                document.title = "Hourly Cost Calculator";
+            }
+            saveState(); // Save state
+            renderTabs();
+        }
+
+        function renderActiveTabData() {
+            let activeTab = null;
+            for(let i=0; i < appState.tabs.length; i++) {
+                if(appState.tabs[i].id === appState.activeTabId) activeTab = appState.tabs[i];
+            }
+            if(!activeTab) return;
+            
+            document.getElementById('tabNameInput').value = activeTab.name.indexOf("Project ") === 0 ? "" : activeTab.name;
+
+            const costList = document.getElementById('costList');
+            costList.innerHTML = '';
+            activeTab.costs.forEach(function(item, index) {
+                const li = document.createElement('li');
+                li.innerHTML = item.details + ' <button class="btn-delete" onclick="deleteLine(' + index + ')">Delete</button>';
+                costList.appendChild(li);
+            });
+
+            const paymentList = document.getElementById('paymentList');
+            paymentList.innerHTML = '';
+            activeTab.payments.forEach(function(payment) {
+                const li = document.createElement('li');
+                li.className = 'payment-record';
+                li.innerText = payment;
+                paymentList.appendChild(li);
+            });
+
+            document.getElementById('totalCostDisplay').innerText = "Total Cost: ₪" + activeTab.total.toFixed(2);
+        }
+
+        // --- CALCULATOR LOGIC ---
+        function calculateCost() {
+            const date = document.getElementById('calcDate').value;
+            const start = document.getElementById('startTime').value;
+            const end = document.getElementById('endTime').value;
+            const tariff = parseFloat(document.getElementById('tariff').value);
+
+            if (!date || !start || !end || isNaN(tariff)) {
+                alert("Please fill in all fields correctly.");
+                return;
+            }
+
+            const startParts = start.split(':');
+            const endParts = end.split(':');
+            
+            const startDecimal = parseInt(startParts[0], 10) + (parseInt(startParts[1], 10) / 60);
+            const endDecimal = parseInt(endParts[0], 10) + (parseInt(endParts[1], 10) / 60);
+            
+            let diffHours = endDecimal - startDecimal;
+            
+            if (diffHours < 0) {
+                diffHours += 24; 
+            }
+
+            const cost = diffHours * tariff;
+            
+            currentPendingCost = {
+                amount: cost,
+                details: date + " | " + start + " - " + end + " (" + diffHours.toFixed(2) + " hrs) | ₪" + cost.toFixed(2)
+            };
+            
+            document.getElementById('currentCostDisplay').innerText = "Current Calculation: " + diffHours.toFixed(2) + " hrs = ₪" + cost.toFixed(2);
+        }
+
+        function addToList() {
+            if (currentPendingCost.amount === 0) {
+                alert("Please calculate a cost first.");
+                return;
+            }
+
+            let activeTab = null;
+            for(let i=0; i < appState.tabs.length; i++) {
+                if(appState.tabs[i].id === appState.activeTabId) activeTab = appState.tabs[i];
+            }
+            if(!activeTab) return;
+            
+            activeTab.costs.push({
+                amount: currentPendingCost.amount,
+                details: currentPendingCost.details
+            });
+            activeTab.total += currentPendingCost.amount;
+
+            currentPendingCost = { amount: 0, details: "" };
+            document.getElementById('currentCostDisplay').innerText = "Current Calculation: 0.00 hrs = ₪0.00";
+
+            saveState(); // Save state
+            renderActiveTabData();
+        }
+
+        function deleteLine(index) {
+            if (confirm("Delete this entry?")) {
+                let activeTab = null;
+                for(let i=0; i < appState.tabs.length; i++) {
+                    if(appState.tabs[i].id === appState.activeTabId) activeTab = appState.tabs[i];
+                }
+                
+                activeTab.total -= activeTab.costs[index].amount;
+                if (activeTab.total < 0.01) activeTab.total = 0; 
+                
+                activeTab.costs.splice(index, 1);
+                
+                saveState(); // Save state
+                renderActiveTabData();
+            }
+        }
+
+        function processPayment() {
+            let activeTab = null;
+            for(let i=0; i < appState.tabs.length; i++) {
+                if(appState.tabs[i].id === appState.activeTabId) activeTab = appState.tabs[i];
+            }
+            
+            if (activeTab.total === 0) {
+                alert("There are no recorded costs to pay.");
+                return;
+            }
+
+            if (confirm("Record a payment of ₪" + activeTab.total.toFixed(2) + "?")) {
+                const today = new Date().toLocaleDateString();
+                const record = "Paid ₪" + activeTab.total.toFixed(2) + " on " + today;
+                
+                activeTab.payments.push(record);
+                activeTab.costs = [];
+                activeTab.total = 0;
+
+                saveState(); // Save state
+                renderActiveTabData();
+            }
+        }
+    </script>
+	<script>
+		if ('serviceWorker' in navigator) {
+			navigator.serviceWorker.register('sw.js')
+				.then(() => console.log('Service Worker Registered'))
+				.catch(err => console.log('Service Worker Failed', err));
+		}
+	</script>
+</body>
+</html>
