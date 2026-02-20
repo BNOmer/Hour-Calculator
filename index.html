@@ -15,7 +15,6 @@
             max-width: 500px;
             margin: auto;
         }
-        /* Tab Bar Styles */
         .tab-bar {
             display: flex;
             overflow-x: auto;
@@ -41,15 +40,9 @@
             color: #000;
             border-top: 3px solid #0056b3;
         }
-        .btn-add-tab {
-            background-color: #28a745;
-            color: white;
-            font-weight: bold;
-            padding: 10px 15px;
-        }
+        .btn-add-tab { background-color: #28a745; color: white; font-weight: bold; }
         .btn-add-tab:hover { background-color: #218838; }
 
-        /* Calculator Container Styles */
         .container { 
             background: #ffffff; 
             padding: 20px; 
@@ -69,7 +62,7 @@
             padding: 8px;
             border: 1px solid #ccc;
             border-radius: 4px;
-            min-width: 100px;
+            min-width: 80px;
         }
         .btn-lang, .btn-share {
             background-color: #6c757d;
@@ -77,9 +70,13 @@
             margin: 0;
             padding: 8px 12px;
             white-space: nowrap;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
         }
         .btn-lang:hover, .btn-share:hover { background-color: #5a6268; }
-        .btn-share { background-color: #17a2b8; color: white; border: none; border-radius: 4px; cursor: pointer; }
+        .btn-share { background-color: #17a2b8; }
         .btn-share:hover { background-color: #138496; }
         
         .btn-delete-tab {
@@ -182,7 +179,6 @@
 <body>
 
     <div class="app-wrapper">
-        
         <div id="mainAppWrapper">
             <div class="tab-bar" id="tabBar"></div>
             <div class="container">
@@ -193,10 +189,10 @@
                     <button class="btn-lang" onclick="toggleLanguage()">עברית/EN</button>
                 </div>
                 
-                <label id="lblDate">Date: <input type="date" id="calcDate" class="input-field"></label>
-                <label id="lblStart">Start Time: <input type="time" id="startTime" class="input-field"></label>
-                <label id="lblEnd">End Time: <input type="time" id="endTime" class="input-field"></label>
-                <label id="lblTariff">Tariff per Hour (₪): <input type="number" id="tariff" class="input-field" min="0" step="0.01"></label>
+                <label><span id="txtDate">Date:</span> <input type="date" id="calcDate" class="input-field"></label>
+                <label><span id="txtStart">Start Time:</span> <input type="time" id="startTime" class="input-field"></label>
+                <label><span id="txtEnd">End Time:</span> <input type="time" id="endTime" class="input-field"></label>
+                <label><span id="txtTariff">Tariff per Hour (₪):</span> <input type="number" id="tariff" class="input-field" min="0" step="0.01"></label>
 
                 <button id="btnCalc" onclick="calculateCost()">Calculate</button>
                 <div class="result-box" id="currentCostDisplay">---</div>
@@ -224,343 +220,4 @@
                 <ul id="viewCostList"></ul>
                 <div class="total-box" id="viewTotalCostDisplay">Total Cost: ₪0.00</div>
                 <br>
-                <button onclick="window.location.href = window.location.pathname.split('?')[0]" style="background-color: #6c757d;">Return to My App</button>
-            </div>
-        </div>
-
-    </div>
-
-    <script>
-        // --- TRANSLATION DICTIONARY ---
-        const dict = {
-            en: {
-                tabPlaceholder: "Name this project...",
-                lblDate: "Date:",
-                lblStart: "Start Time:",
-                lblEnd: "End Time:",
-                lblTariff: "Tariff per Hour (₪):",
-                btnCalc: "Calculate",
-                btnAdd: "Add to List",
-                hdrRecorded: "Recorded Costs",
-                btnPay: "Mark as Paid",
-                hdrHistory: "Payment History",
-                btnReset: "⚠️ Factory Reset App",
-                newTab: "+ New Tab",
-                btnDelete: "Delete",
-                btnDeleteTab: "Delete Tab",
-                btnShareTab: "Share",
-                totalPrefix: "Total Cost: ₪",
-                calcPrefix: "Current Calculation: ",
-                hrs: "hrs",
-                projectPrefix: "Project ",
-                paidText: "Paid ₪",
-                onText: " on ",
-                errFill: "Please fill in all fields correctly.",
-                errCalcFirst: "Please calculate a cost first.",
-                errNoPay: "There are no recorded costs to pay.",
-                errLastTab: "You cannot delete the last remaining tab.",
-                confDelete: "Delete this entry?",
-                confDeleteTab: "Are you sure you want to delete this entire project and all its data?",
-                confPay: "Record a payment of ₪",
-                confReset: "WARNING: This will delete ALL tabs, lists, and payment history forever. Are you absolutely sure?",
-                copiedShare: "Share link copied to clipboard!",
-                askCal: "Would you like to add this payment reminder to your Google Calendar?",
-                viewOnlyTag: "Read-Only Mode"
-            },
-            he: {
-                tabPlaceholder: "שם הפרויקט...",
-                lblDate: "תאריך:",
-                lblStart: "שעת התחלה:",
-                lblEnd: "שעת סיום:",
-                lblTariff: "תעריף לשעה (₪):",
-                btnCalc: "חשב",
-                btnAdd: "הוסף לרשימה",
-                hdrRecorded: "עלויות שנרשמו",
-                btnPay: "סמן כשולם",
-                hdrHistory: "היסטוריית תשלומים",
-                btnReset: "⚠️ איפוס אפליקציה",
-                newTab: "+ כרטיסייה חדשה",
-                btnDelete: "מחק",
-                btnDeleteTab: "מחק פרויקט",
-                btnShareTab: "שתף",
-                totalPrefix: "סך הכל: ₪",
-                calcPrefix: "חישוב נוכחי: ",
-                hrs: "שעות",
-                projectPrefix: "פרויקט ",
-                paidText: "שולם ₪",
-                onText: " בתאריך ",
-                errFill: "אנא מלא את כל השדות כראוי.",
-                errCalcFirst: "אנא חשב עלות תחילה.",
-                errNoPay: "אין עלויות רשומות לתשלום.",
-                errLastTab: "לא ניתן למחוק את הכרטיסייה האחרונה שנותרה.",
-                confDelete: "למחוק רשומה זו?",
-                confDeleteTab: "האם אתה בטוח שברצונך למחוק את כל הפרויקט והנתונים שלו?",
-                confPay: "לרשום תשלום של ₪",
-                confReset: "אזהרה: פעולה זו תמחק את כל הכרטיסיות והיסטוריית התשלומים לצמיתות. האם אתה בטוח?",
-                copiedShare: "קישור השיתוף הועתק ללוח!",
-                askCal: "האם תרצה להוסיף את התשלום ליומן גוגל שלך?",
-                viewOnlyTag: "מצב קריאה בלבד"
-            }
-        };
-
-        let appState = {
-            language: 'en',
-            activeTabId: 1,
-            nextTabId: 2,
-            tabs: [{ id: 1, name: "Project 1", costs: [], payments: [], total: 0 }]
-        };
-
-        let currentPendingCost = { amount: 0, details: "" };
-
-        // --- SAFE INITIALIZATION & URL ROUTING ---
-        function initializeApp() {
-            // Check if URL has a ?view= parameter
-            const params = new URLSearchParams(window.location.search);
-            const viewData = params.get('view');
-            
-            if (viewData) {
-                // Render View-Only mode, ignore local storage
-                try {
-                    const decodedStr = decodeURIComponent(escape(window.atob(viewData)));
-                    const parsedData = JSON.parse(decodedStr);
-                    loadState(); // Just to get language preference
-                    renderViewOnlyMode(parsedData);
-                } catch (e) {
-                    alert("Invalid share link.");
-                    window.location.href = window.location.pathname.split('?')[0]; // Reset URL
-                }
-            } else {
-                // Render Normal mode
-                loadState(); 
-                applyLanguage(); 
-            }
-        }
-
-        if (document.readyState === 'loading') {
-            document.addEventListener('DOMContentLoaded', initializeApp);
-        } else {
-            initializeApp();
-        }
-
-        function saveState() {
-            localStorage.setItem('myHourlyCalculatorData', JSON.stringify(appState));
-        }
-
-        function loadState() {
-            const savedData = localStorage.getItem('myHourlyCalculatorData');
-            if (savedData) {
-                appState = JSON.parse(savedData);
-                if (!appState.language) appState.language = 'en'; 
-            }
-        }
-
-        function hardReset() {
-            const t = dict[appState.language];
-            if (confirm(t.confReset)) {
-                localStorage.removeItem('myHourlyCalculatorData');
-                location.reload(); 
-            }
-        }
-
-        // --- SHARE & VIEW ONLY LOGIC ---
-        function shareCurrentTab() {
-            const activeTab = appState.tabs.find(t => t.id === appState.activeTabId);
-            if(!activeTab) return;
-            const t = dict[appState.language];
-
-            // Package the minimum needed data to save URL space
-            const sharePackage = {
-                n: activeTab.name,
-                c: activeTab.costs.map(cost => cost.details),
-                t: activeTab.total
-            };
-
-            // Convert to Base64 (Handling special Hebrew characters safely)
-            const encodedData = window.btoa(unescape(encodeURIComponent(JSON.stringify(sharePackage))));
-            
-            // Construct the unique link
-            const currentUrl = window.location.origin + window.location.pathname;
-            const shareUrl = `${currentUrl}?view=${encodedData}`;
-
-            // Try to open native share menu (Mobile), fallback to clipboard copy (Desktop)
-            if (navigator.share) {
-                navigator.share({
-                    title: activeTab.name + " - Cost Sheet",
-                    url: shareUrl
-                }).catch(err => console.log("Share cancelled", err));
-            } else {
-                navigator.clipboard.writeText(shareUrl).then(() => {
-                    alert(t.copiedShare);
-                });
-            }
-        }
-
-        function renderViewOnlyMode(data) {
-            document.getElementById('mainAppWrapper').style.display = 'none';
-            document.getElementById('viewOnlyWrapper').style.display = 'block';
-            
-            const t = dict[appState.language];
-            document.getElementById('htmlRoot').dir = appState.language === 'he' ? 'rtl' : 'ltr';
-            
-            document.getElementById('viewOnlyTag').innerText = t.viewOnlyTag;
-            document.getElementById('viewProjectName').innerText = data.n;
-            document.getElementById('viewTotalCostDisplay').innerText = t.totalPrefix + data.t.toFixed(2);
-            
-            const list = document.getElementById('viewCostList');
-            list.innerHTML = '';
-            data.c.forEach(details => {
-                const li = document.createElement('li');
-                li.innerText = details;
-                list.appendChild(li);
-            });
-        }
-
-        // --- LANGUAGE LOGIC ---
-        function toggleLanguage() {
-            appState.language = appState.language === 'en' ? 'he' : 'en';
-            saveState();
-            applyLanguage();
-        }
-
-        function applyLanguage() {
-            const lang = appState.language;
-            const t = dict[lang];
-
-            document.getElementById('htmlRoot').dir = lang === 'he' ? 'rtl' : 'ltr';
-
-            document.getElementById('tabNameInput').placeholder = t.tabPlaceholder;
-            document.getElementById('lblDate').childNodes[0].nodeValue = t.lblDate + " ";
-            document.getElementById('lblStart').childNodes[0].nodeValue = t.lblStart + " ";
-            document.getElementById('lblEnd').childNodes[0].nodeValue = t.lblEnd + " ";
-            document.getElementById('lblTariff').childNodes[0].nodeValue = t.lblTariff + " ";
-            document.getElementById('btnCalc').innerText = t.btnCalc;
-            document.getElementById('btnAdd').innerText = t.btnAdd;
-            document.getElementById('hdrRecorded').innerText = t.hdrRecorded;
-            document.getElementById('btnPay').innerText = t.btnPay;
-            document.getElementById('hdrHistory').innerText = t.hdrHistory;
-            document.getElementById('btnReset').innerText = t.btnReset;
-            document.getElementById('btnDeleteTab').innerText = t.btnDeleteTab;
-            document.getElementById('btnShareTab').innerText = t.btnShareTab;
-
-            renderTabs();
-            renderActiveTabData();
-            resetPendingCost();
-        }
-
-        // --- TAB & UI LOGIC ---
-        function renderTabs() {
-            const tabBar = document.getElementById('tabBar');
-            if (!tabBar) return; 
-            const t = dict[appState.language];
-            tabBar.innerHTML = ''; 
-
-            appState.tabs.forEach(tab => {
-                const btn = document.createElement('button');
-                btn.className = 'tab-btn' + (tab.id === appState.activeTabId ? ' active' : '');
-                
-                let displayName = tab.name;
-                if (tab.name.startsWith("Project ") || tab.name.startsWith("פרויקט ")) {
-                    displayName = t.projectPrefix + tab.id;
-                }
-                btn.innerText = displayName;
-                
-                btn.onclick = function() { switchTab(tab.id); };
-                tabBar.appendChild(btn);
-            });
-
-            const addBtn = document.createElement('button');
-            addBtn.className = 'tab-btn btn-add-tab';
-            addBtn.innerText = t.newTab;
-            addBtn.onclick = createNewTab;
-            tabBar.appendChild(addBtn);
-        }
-
-        function createNewTab() {
-            const newId = appState.nextTabId++;
-            appState.tabs.push({
-                id: newId,
-                name: "Project " + newId,
-                costs: [], payments: [], total: 0
-            });
-            saveState(); 
-            switchTab(newId);
-        }
-
-        function switchTab(id) {
-            appState.activeTabId = id;
-            saveState(); 
-            
-            resetPendingCost();
-            document.getElementById('calcDate').value = "";
-            document.getElementById('startTime').value = "";
-            document.getElementById('endTime').value = "";
-            document.getElementById('tariff').value = "";
-            
-            renderTabs();
-            renderActiveTabData();
-        }
-
-        function deleteCurrentTab() {
-            const t = dict[appState.language];
-            if (appState.tabs.length <= 1) {
-                alert(t.errLastTab);
-                return;
-            }
-            if (confirm(t.confDeleteTab)) {
-                appState.tabs = appState.tabs.filter(tab => tab.id !== appState.activeTabId);
-                appState.activeTabId = appState.tabs[0].id;
-                saveState();
-                switchTab(appState.activeTabId);
-            }
-        }
-
-        function updateTabName() {
-            const newName = document.getElementById('tabNameInput').value;
-            let activeTab = appState.tabs.find(t => t.id === appState.activeTabId);
-            if(!activeTab) return;
-            
-            if (newName.trim() !== "") {
-                activeTab.name = newName;
-                document.title = newName; 
-            } else {
-                activeTab.name = "Project " + activeTab.id;
-                document.title = "Hourly Cost Calculator";
-            }
-            saveState(); 
-            renderTabs();
-        }
-
-        function renderActiveTabData() {
-            let activeTab = appState.tabs.find(t => t.id === appState.activeTabId);
-            if(!activeTab) return;
-            const t = dict[appState.language];
-            
-            if (activeTab.name.startsWith("Project ") || activeTab.name.startsWith("פרויקט ")) {
-                document.getElementById('tabNameInput').value = "";
-            } else {
-                document.getElementById('tabNameInput').value = activeTab.name;
-            }
-
-            const costList = document.getElementById('costList');
-            costList.innerHTML = '';
-            activeTab.costs.forEach(function(item, index) {
-                const li = document.createElement('li');
-                li.innerHTML = `<span>${item.details}</span> <button class="btn-delete" onclick="deleteLine(${index})">${t.btnDelete}</button>`;
-                costList.appendChild(li);
-            });
-
-            const paymentList = document.getElementById('paymentList');
-            paymentList.innerHTML = '';
-            activeTab.payments.forEach(function(payment) {
-                const li = document.createElement('li');
-                li.className = 'payment-record';
-                li.innerText = payment;
-                paymentList.appendChild(li);
-            });
-
-            document.getElementById('totalCostDisplay').innerText = t.totalPrefix + activeTab.total.toFixed(2);
-        }
-
-        function resetPendingCost() {
-            const t = dict[appState.language];
-            currentPendingCost = { amount: 0, details: "" };
+                <button onclick="window.location.href = window.location.pathname.split('?')[0]" style="background-color:
