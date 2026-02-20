@@ -5,114 +5,61 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Hourly Cost Calculator</title>
     <style>
-        body { 
-            font-family: system-ui, sans-serif; 
-            background-color: #f4f4f9; 
-            padding: 20px; 
-            margin: 0;
-        }
-        .app-wrapper {
-            max-width: 500px;
-            margin: auto;
-        }
-        .tab-bar {
-            display: flex;
-            overflow-x: auto;
-            background-color: #dcdcdc;
-            padding: 10px 10px 0 10px;
-            border-radius: 8px 8px 0 0;
-            gap: 5px;
-        }
-        .tab-btn {
-            padding: 10px 15px;
-            background-color: #e9ecef;
-            border: none;
-            border-radius: 5px 5px 0 0;
-            cursor: pointer;
-            font-size: 0.9em;
-            color: #555;
-            white-space: nowrap;
-        }
+        body { font-family: system-ui, sans-serif; background-color: #f4f4f9; padding: 20px; margin: 0; }
+        .app-wrapper { max-width: 500px; margin: auto; }
+        .tab-bar { display: flex; overflow-x: auto; background-color: #dcdcdc; padding: 10px 10px 0 10px; border-radius: 8px 8px 0 0; gap: 5px; }
+        .tab-btn { padding: 10px 15px; background-color: #e9ecef; border: none; border-radius: 5px 5px 0 0; cursor: pointer; font-size: 0.9em; color: #555; white-space: nowrap; }
         .tab-btn:hover { background-color: #f8f9fa; }
-        .tab-btn.active {
-            background-color: #ffffff;
-            font-weight: bold;
-            color: #000;
-            border-top: 3px solid #0056b3;
-        }
+        .tab-btn.active { background-color: #ffffff; font-weight: bold; color: #000; border-top: 3px solid #0056b3; }
         .btn-add-tab { background-color: #28a745; color: white; font-weight: bold; }
-        
-        .container { 
-            background: #ffffff; 
-            padding: 20px; 
-            border-radius: 0 0 8px 8px; 
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1); 
-        }
+        .container { background: #ffffff; padding: 20px; border-radius: 0 0 8px 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
         .header-controls { display: flex; gap: 8px; margin-bottom: 20px; align-items: center; }
         .header-controls input { flex-grow: 1; padding: 8px; border: 1px solid #ccc; border-radius: 4px; }
-        
         .btn-lang { background-color: #6c757d; width: auto; padding: 8px 12px; }
         .btn-delete-tab { background-color: #dc3545; color: white; width: auto; padding: 8px 12px; }
-
         label, .input-field { display: block; width: 100%; margin-bottom: 12px; box-sizing: border-box; }
         .input-field { padding: 8px; margin-top: 4px; border: 1px solid #ccc; border-radius: 4px; }
-        
         button { width: 100%; padding: 10px; margin-top: 10px; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; color: white; background-color: #0056b3;}
-        .btn-calc-add { background-color: #28a745; }
+        .btn-calc-add { background-color: #28a745; margin-bottom: 5px; }
         .btn-export { background-color: #17a2b8; }
         .btn-pay { background-color: #6f42c1; margin-top: 20px; }
-        
-        .result-box { font-weight: bold; margin: 15px 0; padding: 10px; background-color: #e9ecef; border-radius: 4px; text-align: center; }
         ul { list-style-type: none; padding: 0; }
-        
-        li { 
-            background: #f8f9fa; margin: 5px 0; padding: 10px; border-inline-start: 4px solid #0056b3; 
-            border-radius: 3px; font-size: 0.9em; display: flex; justify-content: space-between; align-items: center; gap: 10px;
-        }
+        li { background: #f8f9fa; margin: 5px 0; padding: 10px; border-inline-start: 4px solid #0056b3; border-radius: 3px; font-size: 0.9em; display: flex; flex-direction: column; gap: 5px; }
+        .li-header { display: flex; justify-content: space-between; align-items: center; width: 100%; }
         .payment-record { border-inline-start: 4px solid #6f42c1; background: #f4f0fa; }
-        
+        .payment-details { font-size: 0.8em; color: #666; font-style: italic; white-space: pre-line; margin-top: 5px; border-top: 1px solid #ddd; padding-top: 5px; }
         .btn-small { width: auto; padding: 5px 10px; font-size: 0.8em; margin: 0; }
         .btn-cal { background-color: #4285F4; }
         .btn-delete { background-color: #dc3545; }
-
         .total-box { font-size: 1.2em; font-weight: bold; text-align: end; margin-top: 20px; color: #d9534f; }
         hr { border: 0; height: 1px; background: #ddd; margin: 25px 0; }
         .btn-clear-data { background-color: #dc3545; font-size: 0.8em; }
     </style>
 </head>
 <body>
-
     <div class="app-wrapper">
         <div class="tab-bar" id="tabBar"></div>
-
         <div class="container">
             <div class="header-controls">
                 <input type="text" id="tabNameInput" placeholder="Name this project..." onkeyup="updateTabName()">
                 <button id="btnDeleteTab" class="btn-delete-tab" onclick="deleteCurrentTab()">Delete Tab</button>
                 <button class="btn-lang" onclick="toggleLanguage()">עברית / EN</button>
             </div>
-            
             <label id="lblDate">Date: <input type="date" id="calcDate" class="input-field"></label>
             <label id="lblStart">Start Time: <input type="time" id="startTime" class="input-field"></label>
             <label id="lblEnd">End Time: <input type="time" id="endTime" class="input-field"></label>
             <label id="lblTariff">Tariff per Hour (₪): <input type="number" id="tariff" class="input-field" min="0" step="0.01"></label>
-
-            <button id="btnCalc" onclick="calculateCost()">Calculate</button>
-            <div class="result-box" id="currentCostDisplay">---</div>
-            <button id="btnAdd" class="btn-calc-add" onclick="addToList()">Add to List</button>
+            
+            <button id="btnAdd" class="btn-calc-add" onclick="calculateAndAdd()">Add to List</button>
             <button id="btnExport" class="btn-export" onclick="exportToCSV()">Export to CSV</button>
-
+            
             <h3 id="hdrRecorded">Recorded Costs</h3>
             <ul id="costList"></ul>
             <div class="total-box" id="totalCostDisplay">Total Cost: ₪0.00</div>
-
             <button id="btnPay" class="btn-pay" onclick="processPayment()">Mark as Paid</button>
-
             <hr>
-            
             <h3 id="hdrHistory">Payment History</h3>
             <ul id="paymentList"></ul>
-            
             <button id="btnReset" class="btn-clear-data" onclick="hardReset()">⚠️ Factory Reset App</button>
         </div>
     </div>
@@ -120,81 +67,30 @@
     <script>
         const dict = {
             en: {
-                tabPlaceholder: "Name this project...",
-                lblDate: "Date:",
-                lblStart: "Start Time:",
-                lblEnd: "End Time:",
-                lblTariff: "Tariff per Hour (₪):",
-                btnCalc: "Calculate",
-                btnAdd: "Add to List",
-                btnExport: "Export Project to CSV",
-                hdrRecorded: "Recorded Costs",
-                btnPay: "Mark as Paid",
-                hdrHistory: "Payment History",
-                btnReset: "⚠️ Factory Reset App",
-                newTab: "+ New Tab",
-                btnDelete: "Delete",
-                btnCalendar: "📅 Google Cal",
-                btnDeleteTab: "Delete Tab",
-                totalPrefix: "Total Cost: ₪",
-                calcPrefix: "Current Calculation: ",
-                hrs: "hrs",
-                projectPrefix: "Project ",
-                paidText: "Paid ₪",
-                onText: " on ",
-                calTitle: "Payment Received: ",
-                errFill: "Please fill in all fields correctly.",
-                errCalcFirst: "Please calculate a cost first.",
-                errNoPay: "There are no recorded costs to pay.",
-                errLastTab: "You cannot delete the last remaining tab.",
-                errNoDataExport: "No data to export.",
-                confDelete: "Delete this entry?",
-                confDeleteTab: "Are you sure you want to delete this entire project and all its data?",
-                confPay: "Record a payment of ₪",
-                confReset: "WARNING: This will delete ALL tabs, lists, and payment history forever. Are you absolutely sure?"
+                tabPlaceholder: "Name this project...", lblDate: "Date:", lblStart: "Start Time:", lblEnd: "End Time:", lblTariff: "Tariff per Hour (₪):",
+                btnAdd: "Add Entry to List", btnExport: "Export Project to CSV", hdrRecorded: "Recorded Costs",
+                btnPay: "Mark as Paid", hdrHistory: "Payment History", btnReset: "⚠️ Factory Reset App", newTab: "+ New Tab",
+                btnDelete: "Delete", btnCalendar: "📅 Google Cal", btnDeleteTab: "Delete Tab", totalPrefix: "Total Cost: ₪",
+                hrs: "hrs", projectPrefix: "Project ", paidText: "Paid ₪", onText: " on ",
+                calTitle: "Payment Received: ", detailsPrefix: "Breakdown:\n", errFill: "Please fill in all fields correctly.",
+                errLastTab: "You cannot delete the last remaining tab.", errNoDataExport: "No data to export.",
+                confDelete: "Delete this entry?", confDeleteTab: "Are you sure you want to delete this entire project?",
+                confPay: "Record a payment of ₪", confReset: "WARNING: This will delete ALL data forever. Are you sure?"
             },
             he: {
-                tabPlaceholder: "שם הפרויקט...",
-                lblDate: "תאריך:",
-                lblStart: "שעת התחלה:",
-                lblEnd: "שעת סיום:",
-                lblTariff: "תעריף לשעה (₪):",
-                btnCalc: "חשב",
-                btnAdd: "הוסף לרשימה",
-                btnExport: "ייצא פרויקט ל-CSV",
-                hdrRecorded: "עלויות שנרשמו",
-                btnPay: "סמן כשולם",
-                hdrHistory: "היסטוריית תשלומים",
-                btnReset: "⚠️ איפוס אפליקציה",
-                newTab: "+ כרטיסייה חדשה",
-                btnDelete: "מחק",
-                btnCalendar: "📅 יומן גוגל",
-                btnDeleteTab: "מחק פרויקט",
-                totalPrefix: "סך הכל עולה: ₪",
-                calcPrefix: "חישוב נוכחי: ",
-                hrs: "שעות",
-                projectPrefix: "פרויקט ",
-                paidText: "שולם ₪",
-                onText: " בתאריך ",
-                calTitle: "התקבל תשלום: ",
-                errFill: "אנא מלא את כל השדות כראוי.",
-                errCalcFirst: "אנא חשב עלות תחילה.",
-                errNoPay: "אין עלויות רשומות לתשלום.",
-                errLastTab: "לא ניתן למחוק את הכרטיסייה האחרונה שנותרה.",
-                errNoDataExport: "אין נתונים לייצוא.",
-                confDelete: "למחוק רשומה זו?",
-                confDeleteTab: "האם אתה בטוח שברצונך למחוק את כל הפרויקט והנתונים שלו?",
-                confPay: "לרשום תשלום של ₪",
-                confReset: "אזהרה: פעולה זו תמחק את כל הכרטיסיות והיסטוריית התשלומים לצמיתות. האם אתה בטוח?"
+                tabPlaceholder: "שם הפרויקט...", lblDate: "תאריך:", lblStart: "שעת התחלה:", lblEnd: "שעת סיום:", lblTariff: "תעריף לשעה (₪):",
+                btnAdd: "הוסף רשומה לרשימה", btnExport: "ייצא פרויקט ל-CSV", hdrRecorded: "עלויות שנרשמו",
+                btnPay: "סמן כשולם", hdrHistory: "היסטוריית תשלומים", btnReset: "⚠️ איפוס אפליקציה", newTab: "+ כרטיסייה חדשה",
+                btnDelete: "מחק", btnCalendar: "📅 יומן גוגל", btnDeleteTab: "מחק פרויקט", totalPrefix: "סך הכל עולה: ₪",
+                hrs: "שעות", projectPrefix: "פרויקט ", paidText: "שולם ₪", onText: " בתאריך ",
+                calTitle: "התקבל תשלום: ", detailsPrefix: "פירוט שעות:\n", errFill: "אנא מלא את כל השדות כראוי.",
+                errLastTab: "לא ניתן למחוק את הכרטיסייה האחרונה שנותרה.", errNoDataExport: "אין נתונים לייצוא.",
+                confDelete: "למחוק רשומה זו?", confDeleteTab: "האם אתה בטוח שברצונך למחוק את כל הפרויקט?",
+                confPay: "לרשום תשלום של ₪", confReset: "אזהרה: פעולה זו תמחק את כל הנתונים לצמיתות. בטוח?"
             }
         };
 
-        let appState = {
-            language: 'en', activeTabId: 1, nextTabId: 2,
-            tabs: [{ id: 1, name: "Project 1", costs: [], payments: [], total: 0 }]
-        };
-
-        let currentPendingCost = { amount: 0, details: "" };
+        let appState = { language: 'en', activeTabId: 1, nextTabId: 2, tabs: [{ id: 1, name: "Project 1", costs: [], payments: [], total: 0 }] };
 
         function saveState() { localStorage.setItem('myHourlyCalculatorData', JSON.stringify(appState)); }
         function loadState() {
@@ -202,10 +98,7 @@
             if (savedData) { appState = JSON.parse(savedData); if (!appState.language) appState.language = 'en'; }
         }
 
-        function toggleLanguage() {
-            appState.language = appState.language === 'en' ? 'he' : 'en';
-            saveState(); applyLanguage();
-        }
+        function toggleLanguage() { appState.language = appState.language === 'en' ? 'he' : 'en'; saveState(); applyLanguage(); }
 
         function applyLanguage() {
             const lang = appState.language; const t = dict[lang];
@@ -215,7 +108,6 @@
             document.getElementById('lblStart').childNodes[0].nodeValue = t.lblStart + " ";
             document.getElementById('lblEnd').childNodes[0].nodeValue = t.lblEnd + " ";
             document.getElementById('lblTariff').childNodes[0].nodeValue = t.lblTariff + " ";
-            document.getElementById('btnCalc').innerText = t.btnCalc;
             document.getElementById('btnAdd').innerText = t.btnAdd;
             document.getElementById('btnExport').innerText = t.btnExport;
             document.getElementById('hdrRecorded').innerText = t.hdrRecorded;
@@ -223,15 +115,13 @@
             document.getElementById('hdrHistory').innerText = t.hdrHistory;
             document.getElementById('btnReset').innerText = t.btnReset;
             document.getElementById('btnDeleteTab').innerText = t.btnDeleteTab;
-            renderTabs(); renderActiveTabData(); resetPendingCost();
+            renderTabs(); renderActiveTabData();
         }
 
-        function initializeApp() { loadState(); applyLanguage(); }
-        window.onload = initializeApp;
+        window.onload = () => { loadState(); applyLanguage(); };
 
         function renderTabs() {
-            const tabBar = document.getElementById('tabBar'); if (!tabBar) return;
-            const t = dict[appState.language]; tabBar.innerHTML = ''; 
+            const tabBar = document.getElementById('tabBar'); const t = dict[appState.language]; tabBar.innerHTML = ''; 
             appState.tabs.forEach(tab => {
                 const btn = document.createElement('button');
                 btn.className = 'tab-btn' + (tab.id === appState.activeTabId ? ' active' : '');
@@ -248,132 +138,119 @@
             saveState(); switchTab(newId);
         }
 
-        function switchTab(id) {
-            appState.activeTabId = id; saveState(); resetPendingCost();
-            renderTabs(); renderActiveTabData();
+        function switchTab(id) { 
+            appState.activeTabId = id; saveState(); 
+            document.getElementById('calcDate').value = "";
+            document.getElementById('startTime').value = "";
+            document.getElementById('endTime').value = "";
+            document.getElementById('tariff').value = "";
+            renderTabs(); renderActiveTabData(); 
         }
 
         function updateTabName() {
             const newName = document.getElementById('tabNameInput').value;
             let activeTab = appState.tabs.find(t => t.id === appState.activeTabId);
-            if (activeTab) {
-                activeTab.name = newName.trim() || "Project " + activeTab.id;
-                saveState(); renderTabs();
-            }
+            if (activeTab) { activeTab.name = newName.trim() || "Project " + activeTab.id; saveState(); renderTabs(); }
         }
 
         function renderActiveTabData() {
-            let activeTab = appState.tabs.find(t => t.id === appState.activeTabId);
-            if(!activeTab) return; const t = dict[appState.language];
+            let activeTab = appState.tabs.find(t => t.id === appState.activeTabId); if(!activeTab) return; const t = dict[appState.language];
             document.getElementById('tabNameInput').value = (activeTab.name.startsWith("Project ") || activeTab.name.startsWith("פרויקט ")) ? "" : activeTab.name;
-
             const costList = document.getElementById('costList'); costList.innerHTML = '';
             activeTab.costs.forEach((item, index) => {
                 const li = document.createElement('li');
-                li.innerHTML = `<span>${item.details}</span> <button class="btn-small btn-delete" onclick="deleteLine(${index})">${t.btnDelete}</button>`;
+                li.innerHTML = `<div class="li-header"><span>${item.details}</span> <button class="btn-small btn-delete" onclick="deleteLine(${index})">${t.btnDelete}</button></div>`;
                 costList.appendChild(li);
             });
-
             const paymentList = document.getElementById('paymentList'); paymentList.innerHTML = '';
             activeTab.payments.forEach((payment, idx) => {
                 const li = document.createElement('li'); li.className = 'payment-record';
-                li.innerHTML = `<span>${payment.text}</span> <button class="btn-small btn-cal" onclick="saveToGoogleCalendar(${idx})">${t.btnCalendar}</button>`;
+                li.innerHTML = `<div class="li-header"><span>${payment.text}</span> <button class="btn-small btn-cal" onclick="saveToGoogleCalendar(${idx})">${t.btnCalendar}</button></div>
+                                <div class="payment-details">${t.detailsPrefix}${payment.breakdown}</div>`;
                 paymentList.appendChild(li);
             });
             document.getElementById('totalCostDisplay').innerText = t.totalPrefix + activeTab.total.toFixed(2);
         }
 
-        function calculateCost() {
-            const t = dict[appState.language];
+        // --- NEW UNITED LOGIC ---
+        function calculateAndAdd() {
+            const t = dict[appState.language]; 
             const date = document.getElementById('calcDate').value;
-            const start = document.getElementById('startTime').value;
+            const start = document.getElementById('startTime').value; 
             const end = document.getElementById('endTime').value;
             const tariff = parseFloat(document.getElementById('tariff').value);
-            if (!date || !start || !end || isNaN(tariff)) { alert(t.errFill); return; }
-            
+
+            if (!date || !start || !end || isNaN(tariff)) return alert(t.errFill);
+
+            // Time math
             const startDec = parseInt(start.split(':')[0]) + (parseInt(start.split(':')[1]) / 60);
             const endDec = parseInt(end.split(':')[0]) + (parseInt(end.split(':')[1]) / 60);
             let diff = endDec - startDec; if (diff < 0) diff += 24;
-
             const cost = diff * tariff;
-            currentPendingCost = { amount: cost, details: `${date} | ${start}-${end} (${diff.toFixed(2)}${t.hrs}) | ₪${cost.toFixed(2)}` };
-            document.getElementById('currentCostDisplay').innerText = `${t.calcPrefix}${diff.toFixed(2)}${t.hrs} = ₪${cost.toFixed(2)}`;
-        }
 
-        function addToList() {
-            if (currentPendingCost.amount === 0) return alert(dict[appState.language].errCalcFirst);
+            // Add to data
             let activeTab = appState.tabs.find(t => t.id === appState.activeTabId);
-            activeTab.costs.push({...currentPendingCost});
-            activeTab.total += currentPendingCost.amount;
-            saveState(); resetPendingCost(); renderActiveTabData();
-        }
+            activeTab.costs.push({
+                amount: cost, 
+                details: `${date} | ${start}-${end} (${diff.toFixed(2)}${t.hrs}) | ₪${cost.toFixed(2)}`
+            });
+            activeTab.total += cost;
 
-        function resetPendingCost() { 
-            const t = dict[appState.language]; currentPendingCost = { amount: 0, details: "" };
-            document.getElementById('currentCostDisplay').innerText = t.calcPrefix + "0.00 " + t.hrs + " = ₪0.00";
+            // UI feedback & Save
+            saveState(); 
+            renderActiveTabData();
+            
+            // Optional: Reset time fields after adding to make next entry easier
+            document.getElementById('startTime').value = "";
+            document.getElementById('endTime').value = "";
         }
 
         function processPayment() {
-            const t = dict[appState.language];
-            let activeTab = appState.tabs.find(t => t.id === appState.activeTabId);
+            const t = dict[appState.language]; let activeTab = appState.tabs.find(t => t.id === appState.activeTabId);
             if (activeTab.total === 0) return alert(t.errNoPay);
             if (confirm(t.confPay + activeTab.total.toFixed(2) + "?")) {
                 const now = new Date();
+                const breakdown = activeTab.costs.map(c => `• ${c.details}`).join('\n');
                 const record = {
                     text: t.paidText + activeTab.total.toFixed(2) + t.onText + now.toLocaleDateString(),
-                    amount: activeTab.total.toFixed(2),
-                    date: now.toISOString().split('T')[0].replace(/-/g, '') // Format: YYYYMMDD
+                    breakdown: breakdown,
+                    date: now.toISOString().split('T')[0].replace(/-/g, '')
                 };
-                activeTab.payments.unshift(record);
-                activeTab.costs = []; activeTab.total = 0;
+                activeTab.payments.unshift(record); activeTab.costs = []; activeTab.total = 0;
                 saveState(); renderActiveTabData();
             }
         }
 
         function saveToGoogleCalendar(index) {
-            const t = dict[appState.language];
-            const activeTab = appState.tabs.find(t => t.id === appState.activeTabId);
-            const payment = activeTab.payments[index];
-            
+            const t = dict[appState.language]; const activeTab = appState.tabs.find(t => t.id === appState.activeTabId);
+            const p = activeTab.payments[index];
             const title = encodeURIComponent(t.calTitle + activeTab.name);
-            const details = encodeURIComponent(payment.text);
-            const dateStr = payment.date; // YYYYMMDD
-            
-            // Create Google Calendar Template URL (All day event)
-            const url = `https://www.google.com/calendar/render?action=TEMPLATE&text=${title}&dates=${dateStr}/${dateStr}&details=${details}&sf=true&output=xml`;
-            
-            window.open(url, '_blank');
+            const details = encodeURIComponent(p.text + "\n\n" + t.detailsPrefix + p.breakdown);
+            window.open(`https://www.google.com/calendar/render?action=TEMPLATE&text=${title}&dates=${p.date}/${p.date}&details=${details}&sf=true&output=xml`, '_blank');
         }
 
         function exportToCSV() {
-            const t = dict[appState.language];
-            const activeTab = appState.tabs.find(t => t.id === appState.activeTabId);
+            const t = dict[appState.language]; const activeTab = appState.tabs.find(t => t.id === appState.activeTabId);
             if (!activeTab || activeTab.costs.length === 0) return alert(t.errNoDataExport);
             let csv = "Description,Amount (ILS)\n";
             activeTab.costs.forEach(item => csv += `${item.details.replace(/,/g, " ")},${item.amount.toFixed(2)}\n`);
-            csv += `TOTAL,${activeTab.total.toFixed(2)}`;
-            const link = document.createElement("a");
-            link.href = "data:text/csv;charset=utf-8," + encodeURI(csv);
-            link.download = `${activeTab.name}_Report.csv`;
-            link.click();
+            const link = document.createElement("a"); link.href = "data:text/csv;charset=utf-8," + encodeURI(csv + `TOTAL,${activeTab.total.toFixed(2)}`);
+            link.download = `${activeTab.name}_Report.csv`; link.click();
         }
 
         function deleteLine(index) {
             if (confirm(dict[appState.language].confDelete)) {
                 let activeTab = appState.tabs.find(t => t.id === appState.activeTabId);
-                activeTab.total -= activeTab.costs[index].amount;
-                activeTab.costs.splice(index, 1);
+                activeTab.total -= activeTab.costs[index].amount; activeTab.costs.splice(index, 1);
                 saveState(); renderActiveTabData();
             }
         }
 
         function deleteCurrentTab() {
-            const t = dict[appState.language];
-            if (appState.tabs.length <= 1) return alert(t.errLastTab);
+            const t = dict[appState.language]; if (appState.tabs.length <= 1) return alert(t.errLastTab);
             if (confirm(t.confDeleteTab)) {
                 appState.tabs = appState.tabs.filter(tab => tab.id !== appState.activeTabId);
-                appState.activeTabId = appState.tabs[0].id;
-                saveState(); applyLanguage();
+                appState.activeTabId = appState.tabs[0].id; saveState(); applyLanguage();
             }
         }
 
